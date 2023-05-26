@@ -12,6 +12,7 @@ output_data = 'output_data/daily_report.xlsx'
 #PART 1 - Load Dataset
 
 df = pd.read_excel(input_data)
+df['Date'] = pd.to_datetime(df['Date']).dt.strftime("%Y-%m-%d")
 
 df = df.pivot_table(index=['Gender', 'Date'], columns='Product line', values='Total', aggfunc='sum').round()
 
@@ -62,6 +63,8 @@ barchart.set_categories(categories)
 wb.active.add_chart(barchart, 'J5')
 barchart.title = 'Sales Berdasarkan Produk Perhari'
 barchart.style = 2
+barchart.width = 58
+barchart.height = 15
 wb.save(output_data)
 
 #%%

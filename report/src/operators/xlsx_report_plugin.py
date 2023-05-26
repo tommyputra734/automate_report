@@ -15,6 +15,7 @@ class ExcelReportPlugin():
     
     def main(self):
         df = self.read_input_file()
+        df['Date'] = pd.to_datetime(df['Date']).dt.strftime("%Y-%m-%d")
         df_transform = self.transform()
         self.create_output_file(df_transform)
 
@@ -33,6 +34,7 @@ class ExcelReportPlugin():
         
     def read_input_file(self):
         df = pd.read_excel(self.input_data)
+        df['Date'] = pd.to_datetime(df['Date']).dt.strftime("%Y-%m-%d")
         logging.info(df.head())
         return df
     
@@ -79,21 +81,23 @@ class ExcelReportPlugin():
         workbook.active.add_chart(barchart, 'J5')
         barchart.title = 'Sales Berdasarkan Produk Perhari'
         barchart.style = 2
+        barchart.width = 58
+        barchart.height = 15
         
-        def add_total(self, max_column, max_row, min_row, wb):
-            alphabet = list(string.ascii_uppercase)
-            alphabet_excel = alphabet[:max_column]
-            for i in alphabet_excel:
-             if i != 'A' and i != 'B':
-                wb[f'{i}{max_row+1}'] = f'=SUM({i}{min_row+1}:{i}{max_row})'
-                wb[f'{i}{max_row+1}'].style = 'Currency'
+    def add_total(self, max_column, max_row, min_row, wb):
+        alphabet = list(string.ascii_uppercase)
+        alphabet_excel = alphabet[:max_column]
+        for i in alphabet_excel:
+            if i != 'A' and i != 'B':
+             wb[f'{i}{max_row+1}'] = f'=SUM({i}{min_row+1}:{i}{max_row})'
+             wb[f'{i}{max_row+1}'].style = 'Currency'
 
-            wb[f'{alphabet_excel[0]}{max_row+1}'] = 'Total'
+        wb[f'{alphabet_excel[0]}{max_row+1}'] = 'Total'
 
-            wb['A1'] = 'Sales Report'
-            wb['A2'] = '2019'
-            wb['A1'].font = Font('Arial', bold=True, size=20)
-            wb['A2'].font = Font('Arial', bold=True, size=10)
+        wb['A1'] = 'Sales Report'
+        wb['A2'] = '2019'
+        wb['A1'].font = Font('Arial', bold=True, size=20)
+        wb['A2'].font = Font('Arial', bold=True, size=10)
             
-        def save_file(self, wb):
-            wb.save(self.output_file)
+    def save_file(self, wb):
+        wb.save(self.output_file)
