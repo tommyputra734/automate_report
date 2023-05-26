@@ -76,7 +76,7 @@ class ExcelReportPlugin():
         barchart.set_categories(categories)
 
 
-        workbook.active.add_chart(barchart, 'B187')
+        workbook.active.add_chart(barchart, 'J5')
         barchart.title = 'Sales Berdasarkan Produk Perhari'
         barchart.style = 2
         

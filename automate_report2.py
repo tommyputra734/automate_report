@@ -59,7 +59,7 @@ barchart.add_data(data, titles_from_data=True)
 barchart.set_categories(categories)
 
 
-wb.active.add_chart(barchart, 'B187')
+wb.active.add_chart(barchart, 'J5')
 barchart.title = 'Sales Berdasarkan Produk Perhari'
 barchart.style = 2
 wb.save(output_data)
