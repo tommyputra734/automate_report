@@ -1,3 +1,4 @@
+#%%
 import pandas as pd 
 from openpyxl import load_workbook 
 from openpyxl.styles import *
@@ -16,10 +17,10 @@ class ExcelReportPlugin():
     def main(self):
         df = self.read_input_file()
         df['Date'] = pd.to_datetime(df['Date']).dt.strftime("%Y-%m-%d")
-        df_transform = self.transform()
+        df_transform = self.transform(df)
         self.create_output_file(df_transform)
 
-        wb = load_workbook(self.output_file)
+        wb = load_workbook(self.output_data)
         wb.active = wb['Report']
 
         min_column = wb.active.min_column
@@ -50,24 +51,24 @@ class ExcelReportPlugin():
                              sheet_name='Report',
                              startrow=4)
     
-    def column_dimension(self, workbook):
-        dim_holder = DimensionHolder(worksheet=workbook.active)
+    def column_dimension(self, wb):
+        dim_holder = DimensionHolder(worksheet=wb)
 
-        for col in range(workbook.min_column, workbook.max_column + 1):
-            dim_holder[get_column_letter(col)] = ColumnDimension(workbook.active, min=col, max=col, width=20)
+        for col in range(wb.min_column, wb.max_column + 1):
+            dim_holder[get_column_letter(col)] = ColumnDimension(wb, min=col, max=col, width=20)
 
-        workbook.column_dimensions = dim_holder
+        wb.column_dimensions = dim_holder
         
-    def barchart(self, workbook, min_column, max_column, min_row, max_row):
+    def barchart(self, wb, min_column, max_column, min_row, max_row):
         barchart = BarChart()
 
-        data = Reference(workbook.active,
+        data = Reference(wb,
                  min_col=min_column+2,
                  max_col=max_column,
                  min_row=min_row,
                  max_row=max_row)
 
-        categories = Reference(workbook.active,
+        categories = Reference(wb,
                         min_col=min_column,
                         max_col=min_column+1,
                         min_row=min_row+1,
@@ -78,7 +79,7 @@ class ExcelReportPlugin():
         barchart.set_categories(categories)
 
 
-        workbook.active.add_chart(barchart, 'J5')
+        wb.add_chart(barchart, 'J5')
         barchart.title = 'Sales Berdasarkan Produk Perhari'
         barchart.style = 2
         barchart.width = 58
@@ -100,4 +101,17 @@ class ExcelReportPlugin():
         wb['A2'].font = Font('Arial', bold=True, size=10)
             
     def save_file(self, wb):
-        wb.save(self.output_file)
+        wb.save(self.output_data)
+        
+#%%
+import os
+
+base_path = os.sep.join(os.getcwd().split(os.sep)[:-3])
+print(f'base path: {base_path}')
+
+input_data = base_path + '/input_data/supermarket_sales.xlsx'
+output_data = base_path + '/output_data/daily_report_2.xlsx'
+
+excelReport = ExcelReportPlugin(input_data, output_data)
+excelReport.main()
+# %%
